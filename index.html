@@ -102,7 +102,7 @@ tr.phase-sep td { border-top: 2px solid var(--primary); }
 </head>
 <body>
 
-<h1>GLO aCRM GDP Integration – Project Gantt</h1>
+<h1>Customer 360 CRM Integration — Project Gantt</h1>
 <div class="subtitle">DrMax GDP · ANACRM + GRPDWH → RAW → BASE · 2 ANA + 2 BE</div>
 
 <div class="summary">
@@ -186,6 +186,18 @@ function positionTooltip(e) {
 
 function fmtDate(d) {
   return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear();
+}
+
+function getTaskDateRange(task) {
+  if(!task.x_weeks || !task.x_weeks.length) return '–';
+  const starts = task.x_weeks
+    .map(s => new Date(s.slice(0,10) + 'T00:00:00'))
+    .filter(d => !isNaN(d));
+  if(!starts.length) return '–';
+  const start = new Date(Math.min(...starts.map(d => d.getTime())));
+  const end = new Date(Math.max(...starts.map(d => d.getTime())));
+  end.setDate(end.getDate() + 6);
+  return `${fmtDate(start)} – ${fmtDate(end)}`;
 }
 
 function fmtMd(value) {
@@ -324,12 +336,13 @@ function render() {
       if(t.is_yellow) tags += '<span class="tag crit">CRITICAL</span>';
       const eff = (t.eo!==null?t.eo:'?')+'–'+(t.ep!==null?t.ep:'?')+' MD';
       const wks = t.x_weeks.length + (t.x_weeks.length===1?' week':' weeks');
+      const dateRange = getTaskDateRange(t);
       tip.innerHTML = `${tags}<b>[${t.id}]</b> ${t.activity}<br>
         Role: ${t.role||'–'}<br>
         Layer: ${t.layer||'–'}<br>
         Source: ${t.source||'–'}<br>
         Environment: ${t.env||'–'}<br>
-        Effort estimate: ${eff}<br>
+        Effort estimate: ${eff} (${dateRange})<br>
         Planned duration: ${wks}<br>
         Dependencies: ${t.deps||'–'}`;
       tip.style.display='block';
