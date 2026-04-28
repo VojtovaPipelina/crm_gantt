@@ -99,6 +99,8 @@ tr.phase-sep td { border-top: 2px solid var(--primary); }
 .tooltip .tag.ana { background: var(--anacrm); color: #fff; }
 .tooltip .tag.be { background: var(--grpdwh); color: #fff; }
 .tooltip .tag.crit { background: #f0d86e; color: #333; }
+.tooltip .tag.wait { background: var(--waiting-bar); color: #fff; }
+.tooltip .tag.qg { background: var(--qg-bar); color: #fff; }
 
 @media print { .controls, .btn { display: none; } }
 </style>
@@ -346,10 +348,12 @@ function render() {
       let tags = '';
       if(t.role) tags += `<span class="tag ${t.role.toLowerCase()}">${t.role}</span>`;
       if(t.is_yellow) tags += '<span class="tag crit">CRITICAL</span>';
+      if(t.id==='WAIT-CRM') tags += '<span class="tag wait">WAIT-CRM</span>';
+      if(t.id==='QG-IA') tags += '<span class="tag qg">QG-IA</span>';
       const eff = (t.eo!==null?t.eo:'?')+'–'+(t.ep!==null?t.ep:'?')+' MD';
       const wks = t.x_weeks.length + (t.x_weeks.length===1?' week':' weeks');
       const dateRange = getTaskDateRange(t);
-      tip.innerHTML = `${tags}<b>[${t.id}]</b> ${t.activity}<br>
+      tip.innerHTML = `${tags}${(t.id!=='WAIT-CRM'&&t.id!=='QG-IA')?`<b>[${t.id}]</b> `:''}${t.activity}<br>
         Role: ${t.role||'–'}<br>
         Layer: ${t.layer||'–'}<br>
         Source: ${t.source||'–'}<br>
